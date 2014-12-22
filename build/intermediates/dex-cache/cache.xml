@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pre-dex-items>
+
+    <item
+        dex="/home/diego/desarrollo/AndroidProjects/ParkAssist/app/build/intermediates/pre-dexed/debug/classes-31588c1db9c00f659cd855362afe0bf306bc17b3.jar"
+        jar="/home/diego/desarrollo/AndroidProjects/ParkAssist/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/20.0.0/classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="f21927d22fe31889ecce94dd697a2e75b137e0ef"/>
+    <item
+        dex="/home/diego/desarrollo/AndroidProjects/Sunshine/app/build/intermediates/pre-dexed/debug/support-annotations-21.0.0-b9ba72350c661528d8fa8b411f9009c71b6932a0.jar"
+        jar="/home/diego/desarrollo/android-sdk/android-sdk-linux/extras/android/m2repository/com/android/support/support-annotations/21.0.0/support-annotations-21.0.0.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="1a578b9607b36266c63d43a4fa0ab5664dbe911e"/>
+    <item
+        dex="/home/diego/desarrollo/AndroidProjects/Sunshine/app/build/intermediates/pre-dexed/debug/classes-d2ea957c9643632ae1067ae7fee299f50861bed7.jar"
+        jar="/home/diego/desarrollo/AndroidProjects/Sunshine/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/20.0.0/classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="f21927d22fe31889ecce94dd697a2e75b137e0ef"/>
+    <item
+        dex="/home/diego/desarrollo/AndroidProjects/Sunshine/app/build/intermediates/pre-dexed/debug/classes-c73922388a49d833f6e85737642ff91f32d74f21.jar"
+        jar="/home/diego/desarrollo/AndroidProjects/Sunshine/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.0/classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="686344a780033e4ba22b926cd225f8d4941247e6"/>
+    <item
+        dex="/home/diego/desarrollo/AndroidProjects/ParkAssist/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.0-4e90d6fc9ab95711a5b444b4119342646a7a26d7.jar"
+        jar="/home/diego/desarrollo/AndroidProjects/ParkAssist/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.0/libs/internal_impl-21.0.0.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="1609e6d42d0480b0f4188e2c29f75388fa12a8f0"/>
+    <item
+        dex="/home/diego/desarrollo/AndroidProjects/Sunshine/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.0-9a3e2018d776b55462c11c13b5063efb8dfde270.jar"
+        jar="/home/diego/desarrollo/AndroidProjects/Sunshine/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.0/libs/internal_impl-21.0.0.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="1609e6d42d0480b0f4188e2c29f75388fa12a8f0"/>
+    <item
+        dex="/home/diego/desarrollo/AndroidProjects/ParkAssist/app/build/intermediates/pre-dexed/debug/classes-2b09890343324867030f69c55c3eb4c0d85a910d.jar"
+        jar="/home/diego/desarrollo/AndroidProjects/ParkAssist/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.0/classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="686344a780033e4ba22b926cd225f8d4941247e6"/>
+
+</pre-dex-items>
