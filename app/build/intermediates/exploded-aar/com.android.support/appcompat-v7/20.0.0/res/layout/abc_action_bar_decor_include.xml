@@ -18,22 +18,22 @@
 
     <android.support.v7.internal.widget.ActionBarContainer
         android:id="@+id/action_bar_container"
-        style="?attr/actionBarStyle"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        style="?attr/actionBarStyle">
 
         <android.support.v7.internal.widget.ActionBarView
             android:id="@+id/action_bar"
-            style="?attr/actionBarStyle"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            style="?attr/actionBarStyle" />
 
         <android.support.v7.internal.widget.ActionBarContextView
             android:id="@+id/action_context_bar"
-            style="?attr/actionModeStyle"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone" />
+            android:visibility="gone"
+            style="?attr/actionModeStyle" />
     </android.support.v7.internal.widget.ActionBarContainer>
 
     <FrameLayout
@@ -41,15 +41,15 @@
         android:layout_width="fill_parent"
         android:layout_height="0dip"
         android:layout_weight="1"
-        android:foreground="?android:attr/windowContentOverlay"
-        android:foregroundGravity="fill_horizontal|top" />
+        android:foregroundGravity="fill_horizontal|top"
+        android:foreground="?android:attr/windowContentOverlay" />
 
     <android.support.v7.internal.widget.ActionBarContainer
         android:id="@+id/split_action_bar"
-        style="?attr/actionBarSplitStyle"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:visibility="gone" />
+        style="?attr/actionBarSplitStyle"
+        android:visibility="gone"
+        android:gravity="center" />
 
 </merge>

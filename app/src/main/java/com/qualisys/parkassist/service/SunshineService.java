@@ -32,6 +32,7 @@ public class SunshineService extends IntentService {
 
     static public final String LOCATION_QUERY_EXTRA = "lqe";
     private final String LOG_TAG = SunshineService.class.getSimpleName();
+    private final String PLACES_API_KEY = "AIzaSyCXBD3uUobhxkI4ce9ofskgFL-aj4JF_WU";
 
     public SunshineService() {
         super(SunshineService.class.getSimpleName());
@@ -40,9 +41,9 @@ public class SunshineService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-
         Log.v(LOG_TAG, "Running SunshineService");
         String locationQuery = intent.getStringExtra(LOCATION_QUERY_EXTRA);
+
         // If there's no zip code, there's nothing to look up.  Verify size of params.
         if (locationQuery == null || locationQuery.isEmpty()) {
             return;
@@ -64,18 +65,18 @@ public class SunshineService extends IntentService {
             // Construct the URL for the OpenWeatherMap query
             // Possible parameters are avaiable at OWM's forecast API page, at
             // http://openweathermap.org/API#forecast
+
+            //https://maps.googleapis.com/maps/api/place/textsearch/json?query=parking%20in%20Montevideo&key=AIzaSyCXBD3uUobhxkI4ce9ofskgFL-aj4JF_WU
+
             final String FORECAST_BASE_URL =
-                    "http://api.openweathermap.org/data/2.5/forecast/daily?";
-            final String QUERY_PARAM = "q";
-            final String FORMAT_PARAM = "mode";
-            final String UNITS_PARAM = "units";
-            final String DAYS_PARAM = "cnt";
+                    "https://maps.googleapis.com/maps/api/place/textsearch/json";
+            final String QUERY_PARAM = "query";
+            final String KEY_PARAM = "key";
+            final String query ="Parking in "+locationQuery;
 
             Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
-                    .appendQueryParameter(QUERY_PARAM, locationQuery)
-                    .appendQueryParameter(FORMAT_PARAM, format)
-                    .appendQueryParameter(UNITS_PARAM, units)
-                    .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
+                    .appendQueryParameter(QUERY_PARAM, query)
+                    .appendQueryParameter(KEY_PARAM, PLACES_API_KEY)
                     .build();
 
             URL url = new URL(builtUri.toString());
