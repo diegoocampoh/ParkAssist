@@ -20,12 +20,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.qualisys.parkassist.data.WeatherContract;
-import com.qualisys.parkassist.data.WeatherContract.LocationEntry;
-import com.qualisys.parkassist.data.WeatherContract.WeatherEntry;
+import com.qualisys.parkassist.data.ParkingContract.LocationEntry;
+import com.qualisys.parkassist.data.ParkingContract.ParkingEntry;
 import com.qualisys.parkassist.service.SunshineService;
-
-import java.util.Date;
 
 /**
  * Created by diego on 11/11/2014.
@@ -174,14 +171,10 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         // To only show current and future dates, get the String representation for today,
         // and filter the query to return weather only for dates after or including today.
         // Only return data after today.
-        String startDate = WeatherContract.getDbDateString(new Date());
 
-        // Sort order:  Ascending, by date.
-        String sortOrder = WeatherEntry.COLUMN_DATETEXT + " ASC";
 
         mLocation = Utility.getPreferredLocation(getActivity());
-        Uri weatherForLocationUri = WeatherEntry.buildWeatherLocationWithStartDate(
-                mLocation, startDate);
+        Uri weatherForLocationUri = ParkingEntry.buildParkingLocation(mLocation);
 
         // Now create and return a CursorLoader that will take care of
         // creating a Cursor for the data being displayed.
@@ -191,7 +184,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 FORECAST_COLUMNS,
                 null,
                 null,
-                sortOrder
+                null
         );
     }
 

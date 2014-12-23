@@ -23,7 +23,6 @@ public class ParkingContract {
         public static final String TABLE_NAME = "parking";
         // Column with the foreign key into the location table.
         public static final String COLUMN_LOC_KEY = "location_id";
-
         public static final String COLUMN_ID= "id";
         public static final String COLUMN_FORMATTED_ADDRESS = "formattedAddress";
         public static final String COLUMN_LAT = "lat";

@@ -26,7 +26,6 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.qualisys.parkassist.data.WeatherContract;
-import com.qualisys.parkassist.data.WeatherContract.WeatherEntry;
 
 import org.json.JSONArray;
 import org.json.JSONException;

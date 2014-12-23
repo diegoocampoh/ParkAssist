@@ -37,28 +37,21 @@ public class ParkingDbHelper extends SQLiteOpenHelper {
                 // for a certain date and all dates *following*, so the forecast data
                 // should be sorted accordingly.
                 ParkingEntry.COLUMN_ID + " INTEGER PRIMARY KEY," +
-
                 // the ID of the location entry associated with this weather data
                 ParkingEntry.COLUMN_LOC_KEY + " INTEGER NOT NULL, " +
                 ParkingEntry.COLUMN_FORMATTED_ADDRESS + " TEXT NOT NULL, " +
                 ParkingEntry.COLUMN_ICON + " TEXT NOT NULL, " +
                 ParkingEntry.COLUMN_LAT + " REAL NOT NULL," +
                 ParkingEntry.COLUMN_LON+ " REAL NOT NULL, " +
-                ParkingEntry.COLUMN_MAX_TEMP + " REAL NOT NULL, " +
-
-                ParkingEntry.COLUMN_HUMIDITY + " REAL NOT NULL, " +
-                ParkingEntry.COLUMN_PRESSURE + " REAL NOT NULL, " +
-                ParkingEntry.COLUMN_WIND_SPEED + " REAL NOT NULL, " +
-                ParkingEntry.COLUMN_DEGREES + " REAL NOT NULL, " +
-
+                ParkingEntry.COLUMN_NAME + " TEXT NOT NULL, " +
+                ParkingEntry.COLUMN_PHONE+ " TEXT NOT NULL, " +
+                ParkingEntry.COLUMN_PHOTO_REFERENCE + " TEXT NOT NULL, " +
+                ParkingEntry.COLUMN_PLACE_ID + " TEXT NOT NULL, " +
+                ParkingEntry.COLUMN_REFERENCE + " TEXT NOT NULL, " +
+                ParkingEntry.COLUMN_WEBSITE + " TEXT NOT NULL, " +
                 // Set up the location column as a foreign key to location table.
                 " FOREIGN KEY (" + ParkingEntry.COLUMN_LOC_KEY + ") REFERENCES " +
-                LocationEntry.TABLE_NAME + " (" + LocationEntry._ID + "), " +
-
-                // To assure the application have just one weather entry per day
-                // per location, it's created a UNIQUE constraint with REPLACE strategy
-                " UNIQUE (" + ParkingEntry.COLUMN_DATETEXT + ", " +
-                ParkingEntry.COLUMN_LOC_KEY + ") ON CONFLICT REPLACE);";
+                LocationEntry.TABLE_NAME + " (" + LocationEntry._ID + "); ";
 
 
         final String SQL_CREATE_LOCATION_TABLE = "CREATE TABLE " + LocationEntry.TABLE_NAME + " (" +
