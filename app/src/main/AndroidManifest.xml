@@ -37,7 +37,7 @@
         </activity>
 
         <provider
-            android:name="com.qualisys.parkassist.data.WeatherProvider"
+            android:name="com.qualisys.parkassist.data.ParkingProvider"
             android:authorities="com.qualisys.parkassist" />
 
 

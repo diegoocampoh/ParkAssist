@@ -10,7 +10,7 @@ import android.view.MenuItem;
 public class ForecastDetail extends ActionBarActivity {
 
 
-    public static final String DATE_KEY = "forecast_date";
+    public static final String PARKING_KEY = "parking";
     private final String LOG_TAG = ForecastDetail.class.getSimpleName();
 
     @Override
@@ -18,18 +18,14 @@ public class ForecastDetail extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forecast_detail);
 
-
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
-            String date = getIntent().getStringExtra(DATE_KEY);
-
+            String date = getIntent().getStringExtra(PARKING_KEY);
             Bundle arguments = new Bundle();
-            arguments.putString(ForecastDetail.DATE_KEY, date);
-
+            arguments.putString(PARKING_KEY, date);
             DetailFragment fragment = new DetailFragment();
             fragment.setArguments(arguments);
-
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.weather_detail_container, fragment)
                     .commit();
@@ -42,7 +38,6 @@ public class ForecastDetail extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_forecast_detail, menu);
-
         return true;
     }
 

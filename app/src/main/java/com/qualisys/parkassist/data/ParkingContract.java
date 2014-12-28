@@ -23,7 +23,6 @@ public class ParkingContract {
         public static final String TABLE_NAME = "parking";
         // Column with the foreign key into the location table.
         public static final String COLUMN_LOC_KEY = "location_id";
-        public static final String COLUMN_ID= "id";
         public static final String COLUMN_FORMATTED_ADDRESS = "formattedAddress";
         public static final String COLUMN_LAT = "lat";
         public static final String COLUMN_LON = "lon";
@@ -31,9 +30,10 @@ public class ParkingContract {
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_PLACE_ID = "placeId";
         public static final String COLUMN_REFERENCE = "reference";
-        public static final String COLUMN_PHOTO_REFERENCE = "photoReference";
         public static final String COLUMN_PHONE = "phone";
         public static final String COLUMN_WEBSITE = "website";
+        public static final String COLUMN_RATING = "rating";
+        public static final String COLUMN_PHOTO_URL = "photo_url";
 
 
         public static Uri buildParkingUri(long id) {

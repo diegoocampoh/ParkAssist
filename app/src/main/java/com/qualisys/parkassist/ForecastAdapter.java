@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 
 /**
  * {@link ForecastAdapter} exposes a list of weather forecasts
- * from a {@link Cursor} to a {@link ListView}.
+ * from a {@link Cursor} to a {@link }.
  */
 public class ForecastAdapter extends CursorAdapter {
 
@@ -72,8 +72,6 @@ public class ForecastAdapter extends CursorAdapter {
 
         // Read date from cursor
         String dateString = cursor.getString(ForecastFragment.COL_WEATHER_DATE);
-
-        viewHolder.dateView.setText(Utility.getFriendlyDayString(context, dateString));
 
         // Read weather forecast from cursor
         String description = cursor.getString(ForecastFragment.COL_WEATHER_DESC);

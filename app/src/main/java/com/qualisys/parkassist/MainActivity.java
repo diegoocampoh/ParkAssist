@@ -124,7 +124,7 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
     public void onItemSelected(String date) {
         if (mTwoPane) {
             Bundle args = new Bundle();
-            args.putString(ForecastDetail.DATE_KEY, date);
+            args.putString(ForecastDetail.PARKING_KEY, date);
 
             DetailFragment detailFragment = new DetailFragment();
             detailFragment.setArguments(args);
@@ -136,7 +136,7 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
 
         } else {
             Intent intent = new Intent(this, ForecastDetail.class);
-            intent.putExtra(ForecastDetail.DATE_KEY, date);
+            intent.putExtra(ForecastDetail.PARKING_KEY, date);
             startActivity(intent);
         }
 

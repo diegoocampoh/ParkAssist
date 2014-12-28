@@ -25,8 +25,6 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.qualisys.parkassist.data.WeatherContract;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -188,7 +186,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
             low = temperatureObject.getDouble(OWM_MIN);
 
             ContentValues weatherValues = new ContentValues();
-
+/*
             weatherValues.put(WeatherEntry.COLUMN_LOC_KEY, locationID);
             weatherValues.put(WeatherEntry.COLUMN_DATETEXT, WeatherContract.getDbDateString(new Date(dateTime * 1000L)));
             weatherValues.put(WeatherEntry.COLUMN_HUMIDITY, humidity);
@@ -199,7 +197,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
             weatherValues.put(WeatherEntry.COLUMN_MIN_TEMP, low);
             weatherValues.put(WeatherEntry.COLUMN_SHORT_DESC, description);
             weatherValues.put(WeatherEntry.COLUMN_WEATHER_ID, weatherId);
-
+*/
             cVVector.add(weatherValues);
 
             String highAndLow = formatHighLows(high, low);
@@ -209,8 +207,9 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 
         ContentValues[] contentValuesToBulkInsert = new ContentValues[cVVector.size()];
         cVVector.toArray(contentValuesToBulkInsert);
+        /*
         mContext.getContentResolver().bulkInsert(WeatherEntry.CONTENT_URI, contentValuesToBulkInsert);
-
+*/
         return resultStrs;
     }
 
@@ -320,6 +319,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
         if (existingId == null) {
             Log.v(LOG_TAG, "Didn't find it in the database, inserting now!");
             ContentValues locationValues = new ContentValues();
+            /*
             locationValues.put(WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING, locationSetting);
             locationValues.put(WeatherContract.LocationEntry.COLUMN_CITY_NAME, cityName);
             locationValues.put(WeatherContract.LocationEntry.COLUMN_LAT, lat);
@@ -329,14 +329,16 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
                     .insert(WeatherContract.LocationEntry.CONTENT_URI, locationValues);
 
             return ContentUris.parseId(locationInsertUri);
+            */
         } else {
             return existingId;
         }
-
+        return null;
 
     }
 
     private Long getLocationIdByLocationSetting(String locationSetting) {
+        /*
         // A cursor is your primary interface to the query results.
         Cursor cursor = mContext.getContentResolver().query(
                 WeatherContract.LocationEntry.CONTENT_URI,
@@ -349,7 +351,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
             Log.v(LOG_TAG, "Found it in the database!");
             int locationIdIndex = cursor.getColumnIndex(WeatherContract.LocationEntry._ID);
             return cursor.getLong(locationIdIndex);
-        }
+        }*/
         return null;
     }
 

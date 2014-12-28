@@ -31,19 +31,18 @@ public class TestDb extends AndroidTestCase {
     static ContentValues getParkingValues(Long locationRowId) {
         // Fantastic.  Now that we have a location, add some weather!
         ContentValues parkingValues = new ContentValues();
-
         parkingValues.put(ParkingEntry.COLUMN_LOC_KEY, locationRowId);
         parkingValues.put(ParkingEntry.COLUMN_FORMATTED_ADDRESS,"Francisco Aguilar 863, Montevideo 11300, Uruguay");
-        parkingValues.put(ParkingEntry.COLUMN_LAT, -34.914819);
-        parkingValues.put(ParkingEntry.COLUMN_LON, -56.155044);
+        parkingValues.put(ParkingEntry.COLUMN_LAT, "-34.914819");
+        parkingValues.put(ParkingEntry.COLUMN_LON, "-56.155044");
         parkingValues.put(ParkingEntry.COLUMN_ICON,"http://maps.gstatic.com/mapfiles/place_api/icons/generic_business-71.png");
         parkingValues.put(ParkingEntry.COLUMN_NAME,"Parking Aguilar");
         parkingValues.put(ParkingEntry.COLUMN_PLACE_ID,"ChIJ0an_w3SBn5URQGt5pc5VroM");
         parkingValues.put(ParkingEntry.COLUMN_REFERENCE,"CoQBcgAAAPNeQt4ckOQV0xNiDCnEiCOsAZjVIYmTOKGxe5i6xyG3Skod0OV_0i4bMBLbcUZkYkVADGswRlTUuAGH0jha0W5oE8OfVYf4wizPnF8axhvW_-HLLmZ76IaHyp5TZ0l4irr015Cp5i-TjJA5VidRt3jG06Cvi7uRzLZp4LCrLpYiEhDI-OBeg9FkMZCX_BMFu_ZkGhS5z6nrn5KIIVAml-gXOKZ0EGEjoQ");
-        parkingValues.put(ParkingEntry.COLUMN_PHOTO_REFERENCE, "CpQBiQAAAFCrjpvxmFXVPWccQcouudiiWrFL60dVaFaCkIe3M5WRXz4Wlk1IBSTxt-hQWolukx3530IAZPQXJVpNHZth39EwAIIz41fwvM1r4VSEjWS5SgO-7qvqNP4_voVIBOCJjIawjJmHkZwEfdEOi5e-AGXoE8wL0ERphD4Vq85nPxjelW67U03eNloXHcpHyiwQfxIQrZI9buvKhaD-DDySSoVxnhoU50pDWGwkFOeVJRlsPHkRELZxBtY");
+        parkingValues.put(ParkingEntry.COLUMN_PHOTO_URL, "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=CpQBiQAAAFCrjpvxmFXVPWccQcouudiiWrFL60dVaFaCkIe3M5WRXz4Wlk1IBSTxt-hQWolukx3530IAZPQXJVpNHZth39EwAIIz41fwvM1r4VSEjWS5SgO-7qvqNP4_voVIBOCJjIawjJmHkZwEfdEOi5e-AGXoE8wL0ERphD4Vq85nPxjelW67U03eNloXHcpHyiwQfxIQrZI9buvKhaD-DDySSoVxnhoU50pDWGwkFOeVJRlsPHkRELZxBtY&key=AIzaSyCXBD3uUobhxkI4ce9ofskgFL-aj4JF_WU");
         parkingValues.put(ParkingEntry.COLUMN_PHONE, "+598 2710 4925")  ;
         parkingValues.put(ParkingEntry.COLUMN_WEBSITE,"http://www.parkingaguilar.com/");
-
+        parkingValues.put(ParkingEntry.COLUMN_RATING,1.4);
         return parkingValues;
     }
 

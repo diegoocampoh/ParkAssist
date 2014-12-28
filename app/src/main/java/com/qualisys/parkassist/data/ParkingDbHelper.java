@@ -36,23 +36,23 @@ public class ParkingDbHelper extends SQLiteOpenHelper {
                 // forecasting, it's reasonable to assume the user will want information
                 // for a certain date and all dates *following*, so the forecast data
                 // should be sorted accordingly.
-                ParkingEntry.COLUMN_ID + " INTEGER PRIMARY KEY," +
+                ParkingEntry._ID + " INTEGER PRIMARY KEY," +
                 // the ID of the location entry associated with this weather data
                 ParkingEntry.COLUMN_LOC_KEY + " INTEGER NOT NULL, " +
                 ParkingEntry.COLUMN_FORMATTED_ADDRESS + " TEXT NOT NULL, " +
                 ParkingEntry.COLUMN_ICON + " TEXT NOT NULL, " +
-                ParkingEntry.COLUMN_LAT + " REAL NOT NULL," +
-                ParkingEntry.COLUMN_LON+ " REAL NOT NULL, " +
+                ParkingEntry.COLUMN_LAT + " TEXT NOT NULL," +
+                ParkingEntry.COLUMN_LON+ " TEXT NOT NULL, " +
                 ParkingEntry.COLUMN_NAME + " TEXT NOT NULL, " +
                 ParkingEntry.COLUMN_PHONE+ " TEXT NOT NULL, " +
-                ParkingEntry.COLUMN_PHOTO_REFERENCE + " TEXT NOT NULL, " +
+                ParkingEntry.COLUMN_PHOTO_URL + " TEXT NOT NULL, " +
                 ParkingEntry.COLUMN_PLACE_ID + " TEXT NOT NULL, " +
                 ParkingEntry.COLUMN_REFERENCE + " TEXT NOT NULL, " +
                 ParkingEntry.COLUMN_WEBSITE + " TEXT NOT NULL, " +
+                ParkingEntry.COLUMN_RATING + " REAL NOT NULL, " +
                 // Set up the location column as a foreign key to location table.
                 " FOREIGN KEY (" + ParkingEntry.COLUMN_LOC_KEY + ") REFERENCES " +
-                LocationEntry.TABLE_NAME + " (" + LocationEntry._ID + "); ";
-
+                LocationEntry.TABLE_NAME + " (" + LocationEntry._ID + ")); ";
 
         final String SQL_CREATE_LOCATION_TABLE = "CREATE TABLE " + LocationEntry.TABLE_NAME + " (" +
                 // Why AutoIncrement here, and not above?
@@ -69,7 +69,6 @@ public class ParkingDbHelper extends SQLiteOpenHelper {
                 " UNIQUE (" + LocationEntry.COLUMN_LOCATION_SETTING + ") ON CONFLICT IGNORE);";
         sqLiteDatabase.execSQL(SQL_CREATE_LOCATION_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_WEATHER_TABLE);
-
     }
 
     @Override
@@ -78,5 +77,4 @@ public class ParkingDbHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + ParkingEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
-
 }

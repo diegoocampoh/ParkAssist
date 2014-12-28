@@ -20,7 +20,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.qualisys.parkassist.data.WeatherContract;
+import com.qualisys.parkassist.data.ParkingContract.*;
 
 /**
  * Created by diego on 11/12/14.
@@ -29,19 +29,18 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public static final String DATE_KEY = "forecast_date";
     private static final String LOCATION_KEY = "location";
 
-    private static final String HASHTAG = " #SunshineApp";
+    private static final String HASHTAG = " #ParkAssist";
     private static final int DETAIL_LOADER = 0;
-    private static final String[] FORECAST_COLUMNS = {
-            WeatherContract.WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID,
-            WeatherContract.WeatherEntry.COLUMN_DATETEXT,
-            WeatherContract.WeatherEntry.COLUMN_SHORT_DESC,
-            WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
-            WeatherContract.WeatherEntry.COLUMN_MIN_TEMP,
-            WeatherContract.WeatherEntry.COLUMN_HUMIDITY,
-            WeatherContract.WeatherEntry.COLUMN_DEGREES,
-            WeatherContract.WeatherEntry.COLUMN_WIND_SPEED,
-            WeatherContract.WeatherEntry.COLUMN_PRESSURE,
-            WeatherContract.WeatherEntry.COLUMN_WEATHER_ID
+    private static final String[] PARKING_COLUMNS = {
+            ParkingEntry.TABLE_NAME + "." + ParkingEntry._ID,
+            ParkingEntry.COLUMN_NAME,
+            ParkingEntry.COLUMN_PHOTO_URL,
+            ParkingEntry.COLUMN_RATING,
+            ParkingEntry.COLUMN_FORMATTED_ADDRESS,
+            ParkingEntry.COLUMN_PHONE,
+            ParkingEntry.COLUMN_WEBSITE,
+            ParkingEntry.COLUMN_LAT,
+            ParkingEntry.COLUMN_LON
     };
     private final String LOG_TAG = DetailFragment.class.getSimpleName();
     private String mForecast;
@@ -59,9 +58,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         if (savedInstanceState != null) {
             mLocation = savedInstanceState.getString(LOCATION_KEY);
         }
-
         Bundle arguments = getArguments();
-        if (arguments != null && arguments.containsKey(ForecastDetail.DATE_KEY)) {
+        if (arguments != null && arguments.containsKey(ForecastDetail.PARKING_KEY)) {
             getLoaderManager().initLoader(DETAIL_LOADER, null, this);
         }
     }
@@ -71,7 +69,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         super.onResume();
         Bundle arguments = getArguments();
         if (arguments != null
-                && arguments.containsKey(ForecastDetail.DATE_KEY)
+                && arguments.containsKey(ForecastDetail.PARKING_KEY)
                 && mLocation != null
                 && !mLocation.equals(Utility.getPreferredLocation(getActivity()))) {
             getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
@@ -115,26 +113,16 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Log.v(LOG_TAG, "In onCreateLoader");
-
-        String forecastDate = getArguments().getString(ForecastDetail.DATE_KEY);
-
-        // Sort order:  Ascending, by date.
-        String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATETEXT + " ASC";
-
-        String mLocation = Utility.getPreferredLocation(getActivity());
-        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
-                mLocation, forecastDate);
-        Log.v(LOG_TAG, weatherForLocationUri.toString());
-
-        // Now create and return a CursorLoader that will take care of
-        // creating a Cursor for the data being displayed.
+        Long parkingId = getArguments().getLong(ForecastDetail.PARKING_KEY);
+        Uri parkingById = ParkingEntry.buildParkingUri(parkingId);
+        Log.v(LOG_TAG, parkingById.toString());
         return new CursorLoader(
                 getActivity(),
-                weatherForLocationUri,
-                FORECAST_COLUMNS,
+                parkingById,
+                PARKING_COLUMNS,
                 null,
                 null,
-                sortOrder
+                null
         );
     }
 
@@ -144,6 +132,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         if (!data.moveToFirst()) {
             return;
         }
+
+        /*
+        Fill view
 
         String date = data.getString(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_DATETEXT));
         String friendlyDateText = Utility.getDayName(getActivity(), date);
@@ -196,6 +187,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         if (mShareActionProvider != null) {
             mShareActionProvider.setShareIntent(createShareForecastIntent());
         }
+        */
     }
 
     @Override

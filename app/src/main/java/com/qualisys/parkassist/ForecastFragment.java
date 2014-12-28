@@ -48,13 +48,11 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             // On the one hand, that's annoying.  On the other, you can search the weather table
             // using the location set by the user, which is only in the Location table.
             // So the convenience is worth it.
-            WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID,
-            WeatherEntry.COLUMN_DATETEXT,
-            WeatherEntry.COLUMN_SHORT_DESC,
-            WeatherEntry.COLUMN_MAX_TEMP,
-            WeatherEntry.COLUMN_MIN_TEMP,
-            LocationEntry.COLUMN_LOCATION_SETTING,
-            WeatherEntry.COLUMN_WEATHER_ID,
+            ParkingEntry.TABLE_NAME + "." + ParkingEntry._ID,
+            ParkingEntry.COLUMN_NAME,
+            ParkingEntry.COLUMN_FORMATTED_ADDRESS,
+            ParkingEntry.COLUMN_PHONE,
+            ParkingEntry.COLUMN_ICON
     };
     private static final String SELECTED_POSITION_KEY = "SELECTED_ITEM";
     private int mSelectedPosition = ListView.INVALID_POSITION;

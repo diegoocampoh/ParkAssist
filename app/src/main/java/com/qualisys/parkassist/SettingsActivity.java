@@ -9,7 +9,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 
-import com.qualisys.parkassist.data.WeatherContract;
+import com.qualisys.parkassist.data.ParkingContract.*;
 
 /**
  * A {@link android.preference.PreferenceActivity} that presents a set of application settings.
@@ -67,7 +67,7 @@ public class SettingsActivity extends PreferenceActivity
                 weatherTask.execute(location);
             } else {
                 // notify code that weather may be impacted
-                getContentResolver().notifyChange(WeatherContract.WeatherEntry.CONTENT_URI, null);
+                getContentResolver().notifyChange(ParkingEntry.CONTENT_URI, null);
             }
         }
 

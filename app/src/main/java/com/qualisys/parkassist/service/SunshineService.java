@@ -10,7 +10,10 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
-import com.qualisys.parkassist.data.WeatherContract;
+import com.qualisys.parkassist.data.ParkingContract;
+import com.qualisys.parkassist.data.ParkingContract.LocationEntry;
+import com.qualisys.parkassist.data.ParkingContract.ParkingEntry;
+import com.qualisys.parkassist.data.model.Parking;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,7 +25,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Date;
 import java.util.Vector;
 
 /**
@@ -40,79 +42,62 @@ public class SunshineService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-
-        Log.v(LOG_TAG, "Running SunshineService");
+        Log.v(LOG_TAG, "Running "+this.getClass().getSimpleName());
         String locationQuery = intent.getStringExtra(LOCATION_QUERY_EXTRA);
 
-        // If there's no zip code, there's nothing to look up.  Verify size of params.
+        // If there's no location code, there's nothing to look up.  Verify size of params.
         if (locationQuery == null || locationQuery.isEmpty()) {
             return;
         }
+        // Will contain the raw JSON response as a string.
+        String jsonString = null;
+        //https://maps.googleapis.com/maps/api/place/textsearch/json?query=parking%20in%20Montevideo&key=AIzaSyCXBD3uUobhxkI4ce9ofskgFL-aj4JF_WU
 
-        // These two need to be declared outside the try/catch
-        // so that they can be closed in the finally block.
+        final String FORECAST_BASE_URL =
+                "https://maps.googleapis.com/maps/api/place/textsearch/json";
+        final String QUERY_PARAM = "query";
+        final String KEY_PARAM = "key";
+        final String query ="Parking in "+locationQuery;
+
+        Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
+                .appendQueryParameter(QUERY_PARAM, query)
+                .appendQueryParameter(KEY_PARAM, PLACES_API_KEY)
+                .build();
+        jsonString = getRESTData(builtUri.toString());
+        try {
+            getParkingsFromJSON(jsonString, locationQuery);
+        } catch (Exception e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+            e.printStackTrace();
+        }
+        return;
+    }
+
+    private String getRESTData(String uri) {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
-
-        // Will contain the raw JSON response as a string.
-        String forecastJsonStr = null;
-
-        String format = "json";
-        String units = "metric";
-        int numDays = 14;
-
         try {
-            // Construct the URL for the OpenWeatherMap query
-            // Possible parameters are avaiable at OWM's forecast API page, at
-            // http://openweathermap.org/API#forecast
-
-            //https://maps.googleapis.com/maps/api/place/textsearch/json?query=parking%20in%20Montevideo&key=AIzaSyCXBD3uUobhxkI4ce9ofskgFL-aj4JF_WU
-
-            final String FORECAST_BASE_URL =
-                    "https://maps.googleapis.com/maps/api/place/textsearch/json";
-            final String QUERY_PARAM = "query";
-            final String KEY_PARAM = "key";
-            final String query ="Parking in "+locationQuery;
-
-            Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
-                    .appendQueryParameter(QUERY_PARAM, query)
-                    .appendQueryParameter(KEY_PARAM, PLACES_API_KEY)
-                    .build();
-
-            URL url = new URL(builtUri.toString());
-
-            // Create the request to OpenWeatherMap, and open the connection
+            URL url = new URL(uri);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
-
-            // Read the input stream into a String
             InputStream inputStream = urlConnection.getInputStream();
             StringBuffer buffer = new StringBuffer();
             if (inputStream == null) {
-                // Nothing to do.
-                return;
+                return null;
             }
             reader = new BufferedReader(new InputStreamReader(inputStream));
-
             String line;
             while ((line = reader.readLine()) != null) {
-                // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                // But it does make debugging a *lot* easier if you print out the completed
-                // buffer for debugging.
                 buffer.append(line + "\n");
             }
-
             if (buffer.length() == 0) {
-                // Stream was empty.  No point in parsing.
-                return;
+                return null;
             }
-            forecastJsonStr = buffer.toString();
+            return buffer.toString();
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
-            // If the code didn't successfully get the weather data, there's no point in attemping
-            // to parse it.
-            return;
+            return null;
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -125,15 +110,6 @@ public class SunshineService extends IntentService {
                 }
             }
         }
-
-        try {
-            getWeatherDataFromJson(forecastJsonStr, numDays, locationQuery);
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-            e.printStackTrace();
-        }
-        // This will only happen if there was an error getting or parsing the forecast.
-        return;
     }
 
     /**
@@ -143,131 +119,86 @@ public class SunshineService extends IntentService {
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
-    private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays,
-                                            String locationSetting)
-            throws JSONException {
+    private String[] getParkingsFromJSON(String jsonString, String locationSetting)
+            throws JSONException, IOException {
+        // keys for getting details
+        //https://maps.googleapis.com/maps/api/place/details/json?reference=PLACEREFERENCE&key=AddYourOwnKeyHere
+        final String PLACE_DETAIL_URL =
+                "https://maps.googleapis.com/maps/api/place/details/json";
+        final String REFERENCE = "reference";
+        final String KEY_PARAM = "key";
 
-        // These are the names of the JSON objects that need to be extracted.
+        // Basic elements of a place, for further details, see the next group of tags
+        final String PLACES_NEXTPAGE = "next_page_token";
+        final String PLACES_RESULTS_ROOT = "results";
+        final String PLACES_ADDRESS = "formatted_address";
+        final String PLACES_GEOMETRY_ROOT = "geometry";
+        final String PLACES_LOCATION_ROOT = "location";
+        final String PLACES_GEOMETRY_LAT = "lat";
+        final String PLACES_GEOMETRY_LON = "lng";
+        final String PLACES_ICON = "icon";
+        final String PLACES_ID = "id";
+        final String PLACES_NAME = "name";
+        final String PLACES_PHOTOS_ROOT = "photos";
+        final String PLACES_PHOTOS_HEIGHT = "height";
+        final String PLACES_PHOTOS_WIDTH = "width";
+        final String PLACES_PHOTO_REFERENCE = "photo_reference";
+        final String PLACES_PLACE_ID = "place_id";
+        final String PLACES_REFERENCE = "reference";
 
-        // Location information
-        final String OWM_CITY = "city";
-        final String OWM_CITY_NAME = "name";
-        final String OWM_COORD = "coord";
-        final String OWM_COORD_LAT = "lat";
-        final String OWM_COORD_LONG = "lon";
-
-        // Weather information.  Each day's forecast info is an element of the "list" array.
-        final String OWM_LIST = "list";
-
-        final String OWM_DATETIME = "dt";
-        final String OWM_PRESSURE = "pressure";
-        final String OWM_HUMIDITY = "humidity";
-        final String OWM_WINDSPEED = "speed";
-        final String OWM_WIND_DIRECTION = "deg";
-
-        // All temperatures are children of the "temp" object.
-        final String OWM_TEMPERATURE = "temp";
-        final String OWM_MAX = "max";
-        final String OWM_MIN = "min";
-
-        final String OWM_WEATHER = "weather";
-        final String OWM_DESCRIPTION = "main";
-        final String OWM_WEATHER_ID = "id";
-
-        JSONObject forecastJson = new JSONObject(forecastJsonStr);
-        JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
-
-        JSONObject cityJson = forecastJson.getJSONObject(OWM_CITY);
-        String cityName = cityJson.getString(OWM_CITY_NAME);
-        JSONObject coordJSON = cityJson.getJSONObject(OWM_COORD);
-        double cityLatitude = coordJSON.getLong(OWM_COORD_LAT);
-        double cityLongitude = coordJSON.getLong(OWM_COORD_LONG);
-
-        Log.v(LOG_TAG, cityName + ", with coord: " + cityLatitude + " " + cityLongitude);
+        JSONObject root_json = new JSONObject(jsonString);
+        JSONArray places_array = root_json.getJSONArray(PLACES_RESULTS_ROOT);
 
         // Insert the location into the database.
-        long locationID = addLocation(locationSetting, cityName, cityLatitude, cityLongitude);
+        long locationID = addLocation(locationSetting);
 
-        Vector<ContentValues> cVVector = new Vector<ContentValues>(weatherArray.length());
-        String[] resultStrs = new String[numDays];
+        Vector<ContentValues> cVVector = new Vector<ContentValues>(places_array.length());
 
-        for (int i = 0; i < weatherArray.length(); i++) {
-            // These are the values that will be collected.
+        for (int i = 0; i < places_array.length(); i++) {
+            Parking parking = new Parking();
+            // Get the JSON object representing the parking
+            JSONObject jsonParking = places_array.getJSONObject(i);
+            parking.setFormattedAddress(jsonParking.getString(PLACES_ADDRESS));
 
-            long dateTime;
-            double pressure;
-            int humidity;
-            double windSpeed;
-            double windDirection;
+            //Location json object
+            JSONObject location =  jsonParking.getJSONObject(PLACES_GEOMETRY_ROOT).getJSONObject(PLACES_LOCATION_ROOT);
+            parking.setLat(location.getDouble(PLACES_GEOMETRY_LAT));
+            parking.setLon(location.getDouble(PLACES_GEOMETRY_LON));
+            parking.setIcon(jsonParking.getString(PLACES_ICON));
+            parking.setId(jsonParking.getString(PLACES_ID));
+            parking.setName(PLACES_NAME);
 
-            double high;
-            double low;
-
-            String description;
-            int weatherId;
-
-            // Get the JSON object representing the day
-            JSONObject dayForecast = weatherArray.getJSONObject(i);
-
-            // The date/time is returned as a long.  We need to convert that
-            // into something human-readable, since most people won't read "1400356800" as
-            // "this saturday".
-            dateTime = dayForecast.getLong(OWM_DATETIME);
-
-            pressure = dayForecast.getDouble(OWM_PRESSURE);
-            humidity = dayForecast.getInt(OWM_HUMIDITY);
-            windSpeed = dayForecast.getDouble(OWM_WINDSPEED);
-            windDirection = dayForecast.getDouble(OWM_WIND_DIRECTION);
-
-            // Description is in a child array called "weather", which is 1 element long.
-            // That element also contains a weather code.
-            JSONObject weatherObject =
-                    dayForecast.getJSONArray(OWM_WEATHER).getJSONObject(0);
-            description = weatherObject.getString(OWM_DESCRIPTION);
-            weatherId = weatherObject.getInt(OWM_WEATHER_ID);
-
-            // Temperatures are in a child object called "temp".  Try not to name variables
-            // "temp" when working with temperature.  It confuses everybody.
-            JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
-            high = temperatureObject.getDouble(OWM_MAX);
-            low = temperatureObject.getDouble(OWM_MIN);
-
-            ContentValues weatherValues = new ContentValues();
-
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_LOC_KEY, locationID);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_DATETEXT, WeatherContract.getDbDateString(new Date(dateTime * 1000L)));
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_HUMIDITY, humidity);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_PRESSURE, pressure);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED, windSpeed);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_DEGREES, windDirection);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP, high);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP, low);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC, description);
-            weatherValues.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID, weatherId);
-            cVVector.add(weatherValues);
+            //Get the photo reference
+            try {
+                JSONObject jsonPhoto = jsonParking.getJSONArray(PLACES_PHOTOS_ROOT).getJSONObject(0);
+                String photoReference = jsonPhoto.getString(PLACES_PHOTO_REFERENCE);
+                String photoWidth = jsonPhoto.getString(PLACES_PHOTOS_WIDTH);
+                String photoHeight = jsonPhoto.getString(PLACES_PHOTOS_HEIGHT);
+                parking.setPhotoURL(obtainPhotoURL(photoReference, photoWidth, photoHeight));
+            }catch (JSONException e){
+                parking.setPhotoURL(null);
+            }
+            parking.setPlaceId(jsonParking.getString(PLACES_PLACE_ID));
+            parking.setReference(jsonParking.getString(PLACES_REFERENCE));
+            obtainParkingDetails(parking);
+            cVVector.add(parking.toContentValues());
         }
         ContentValues[] contentValuesToBulkInsert = new ContentValues[cVVector.size()];
         cVVector.toArray(contentValuesToBulkInsert);
-        this.getContentResolver().bulkInsert(WeatherContract.WeatherEntry.CONTENT_URI, contentValuesToBulkInsert);
-        return resultStrs;
+        this.getContentResolver().bulkInsert(ParkingEntry.CONTENT_URI, contentValuesToBulkInsert);
+        return new String[]{"2"};
     }
 
-
-    private Long addLocation(String locationSetting, String cityName, double lat, double lon) {
-
-        Log.v(LOG_TAG, "inserting " + cityName + ", with coord: " + lat + ", " + lon);
-
+    private Long addLocation(String locationSetting) {
+        Log.v(LOG_TAG, "inserting " + locationSetting);
         Long existingId = getLocationIdByLocationSetting(locationSetting);
         if (existingId == null) {
             Log.v(LOG_TAG, "Didn't find it in the database, inserting now!");
             ContentValues locationValues = new ContentValues();
-            locationValues.put(WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING, locationSetting);
-            locationValues.put(WeatherContract.LocationEntry.COLUMN_CITY_NAME, cityName);
-            locationValues.put(WeatherContract.LocationEntry.COLUMN_LAT, lat);
-            locationValues.put(WeatherContract.LocationEntry.COLUMN_LON, lon);
+            locationValues.put(ParkingContract.LocationEntry.COLUMN_LOCATION_SETTING, locationSetting);
 
             Uri locationInsertUri = this.getContentResolver()
-                    .insert(WeatherContract.LocationEntry.CONTENT_URI, locationValues);
+                    .insert(ParkingContract.LocationEntry.CONTENT_URI, locationValues);
 
             return ContentUris.parseId(locationInsertUri);
         } else {
@@ -280,22 +211,21 @@ public class SunshineService extends IntentService {
     private Long getLocationIdByLocationSetting(String locationSetting) {
         // A cursor is your primary interface to the query results.
         Cursor cursor = this.getContentResolver().query(
-                WeatherContract.LocationEntry.CONTENT_URI,
-                new String[]{WeatherContract.LocationEntry._ID}, // leaving "columns" null just returns all the columns.
-                WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ? ", // cols for "where" clause
+                LocationEntry.CONTENT_URI,
+                new String[]{LocationEntry._ID}, // leaving "columns" null just returns all the columns.
+                LocationEntry.COLUMN_LOCATION_SETTING + " = ? ", // cols for "where" clause
                 new String[]{locationSetting}, // values for "where" clause
                 null  // sort order
         );
         if (cursor.moveToFirst()) {
             Log.v(LOG_TAG, "Found it in the database!");
-            int locationIdIndex = cursor.getColumnIndex(WeatherContract.LocationEntry._ID);
+            int locationIdIndex = cursor.getColumnIndex(LocationEntry._ID);
             return cursor.getLong(locationIdIndex);
         }
         return null;
     }
 
     public static class AlarmReceiver extends BroadcastReceiver {
-
         @Override
         public void onReceive(Context context, Intent intent) {
             Intent sendIntent = new Intent(context, SunshineService.class);
@@ -304,4 +234,59 @@ public class SunshineService extends IntentService {
 
         }
     }
+
+
+    private String obtainPhotoURL(String photoReference, String width, String height) throws IOException {
+
+        //https://maps.googleapis.com/maps/api/place/photo?maxwidth=MAXWIDTH&photoreference=PHOTOREFkey=AddYourOwnKeyHere
+        final String PLACE_PHOTO_URL =
+                "https://maps.googleapis.com/maps/api/place/photo";
+        final String REFERENCE = "photoreference";
+        final String KEY_PARAM = "key";
+        final String MAX_HEIGHT = "maxheight";
+        final String MAX_WIDTH = "maxwidth";
+
+        Uri builtUri = Uri.parse(PLACE_PHOTO_URL).buildUpon()
+                .appendQueryParameter(MAX_HEIGHT, height)
+                .appendQueryParameter(MAX_WIDTH, width)
+                .appendQueryParameter(REFERENCE, photoReference)
+                .appendQueryParameter(KEY_PARAM, PLACES_API_KEY)
+                .build();
+        return builtUri.toString();
+    }
+
+    private void obtainParkingDetails(Parking parking) throws JSONException {
+        //https://maps.googleapis.com/maps/api/place/details/json?reference=REFERENCE&key=AddYourOwnKeyHere
+        // Detailed place info
+        final String PLACES_DETAIL_PHONE = "international_phone_number";
+        final String PLACES_DETAIL_WEBSITE = "website";
+        final String PLACES_DETAIL_RATING = "rating";
+        final String PLACE_PHOTO_URL = "https://maps.googleapis.com/maps/api/place/details/json";
+        final String REFERENCE = "reference";
+        final String KEY_PARAM = "key";
+        final String PLACES_DETAIL_ROOT = "result";
+
+        Uri builtUri = Uri.parse(PLACE_PHOTO_URL).buildUpon()
+                .appendQueryParameter(REFERENCE, parking.getReference())
+                .appendQueryParameter(KEY_PARAM, PLACES_API_KEY)
+                .build();
+        String jsonDetails= getRESTData(builtUri.toString());
+        JSONObject details = new JSONObject(jsonDetails).getJSONObject(PLACES_DETAIL_ROOT);
+        try{
+            parking.setPhone(details.getString(PLACES_DETAIL_PHONE));
+        }catch (JSONException e){
+
+        }
+
+        try{
+            parking.setRating(details.getDouble(PLACES_DETAIL_RATING));
+        }catch(JSONException e){
+            parking.setRating(-1d);
+        }
+        parking.setWebsite(details.getString(PLACES_DETAIL_WEBSITE));
+
+    }
+
+
+
 }
